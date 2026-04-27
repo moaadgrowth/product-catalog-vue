@@ -43,7 +43,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 ## Verification Scripts
 
-- Prefer checking behavior via the real UI, Artisan, or the database over ad-hoc one-off scripts when investigating issues.
+- Do not create verification scripts or tinker when tests cover that functionality and prove they work. Unit and feature tests are more important.
 
 ## Application Structure & Architecture
 
@@ -97,7 +97,7 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 ## Tinker
 
-- Execute PHP in app context for debugging. Do not create models without user approval. Prefer existing Artisan commands over custom tinker code.
+- Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
 - Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
   - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
 
@@ -161,9 +161,11 @@ This project has domain-specific skills available. You MUST activate the relevan
 
 - When generating links to other pages, prefer named routes and the `route()` function.
 
-## Factories & seeding
+## Testing
 
-- When defining factories, use model factories and optional custom states. Faker: use `$this->faker` or `fake()` per project convention.
+- When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
+- Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
+- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
 
 ## Vite Error
 
