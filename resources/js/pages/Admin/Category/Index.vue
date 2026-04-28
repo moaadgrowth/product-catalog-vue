@@ -10,6 +10,8 @@ import { Head } from '@inertiajs/vue3';
 
     <div class="p-6">
         <h1 class="text-2xl font-semibold">Admin category list</h1>
-        <p class="mt-2 text-gray-600">Placeholder — real list comes in the next checklist.</p>
+        <p class="mt-2 text-gray-600">
+            Placeholder — real list comes in the next checklist.
+        </p>
     </div>
 </template>
