@@ -14,4 +14,6 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
 
     Route::resource('categories', CategoryController::class)->except(['show']);
+    Route::resource('products', AdminProductController::class)->except(['show']);
 });
+
