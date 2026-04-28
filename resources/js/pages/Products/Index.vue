@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
+import PublicLayout from '@/layouts/PublicLayout.vue';
+import { index as productsIndex } from '@/routes/products/index';
 
 interface Category {
     id: number;
@@ -14,77 +16,90 @@ interface Product {
     categories: Category[];
 }
 
-defineProps<{
+const props = defineProps<{
     products: Product[];
     categories: Category[];
     categoryFilter: number | null;
 }>();
+
+function categoryLabel(product: Product): string {
+    const names = product.categories.map((c) => c.name);
+
+    return names.length ? names.join(', ') : '—';
+}
+
+function onCategoryChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+
+    if (value === '') {
+        router.visit(productsIndex.url());
+
+        return;
+    }
+
+    router.visit(productsIndex.url({ query: { category: Number(value) } }));
+}
 </script>
 
 <template>
-    <Head title="Products" />
+    <PublicLayout>
+        <Head title="Products" />
 
-    <div class="mx-auto max-w-4xl p-6">
-        <h1 class="text-2xl font-semibold">Products</h1>
+        <div class="mx-auto max-w-3xl space-y-6 p-6">
+            <h1 class="font-display text-2xl font-semibold text-stone-900">
+                Products
+            </h1>
 
-        <!-- Filter: “All” + each category (same routes your controller expects) -->
-        <nav class="mt-4 flex flex-wrap gap-2">
-            <Link
-                href="/products"
-                class="rounded border px-3 py-1 text-sm"
-                :class="
-                    categoryFilter === null
-                        ? 'border-gray-900 bg-gray-100'
-                        : 'border-gray-300 bg-white'
-                "
-            >
-                All
-            </Link>
-
-            <Link
-                v-for="category in categories"
-                :key="category.id"
-                :href="`/products?category=${category.id}`"
-                class="rounded border px-3 py-1 text-sm"
-                :class="
-                    categoryFilter === category.id
-                        ? 'border-gray-900 bg-gray-100'
-                        : 'border-gray-300 bg-white'
-                "
-            >
-                {{ category.name }}
-            </Link>
-        </nav>
-
-        <!-- Product list -->
-        <ul class="mt-8 space-y-4">
-            <li v-if="products.length === 0" class="text-gray-500">
-                No products match this filter.
-            </li>
-
-            <li
-                v-for="product in products"
-                :key="product.id"
-                class="rounded border border-gray-200 p-4"
-            >
-                <div class="font-medium">{{ product.name }}</div>
-                <div class="text-sm text-gray-600">{{ product.price }}</div>
-                <p
-                    v-if="product.description"
-                    class="mt-2 text-sm text-gray-700"
+            <div>
+                <label
+                    for="category"
+                    class="mb-1 block text-sm font-medium text-stone-700"
                 >
-                    {{ product.description }}
-                </p>
-                <div class="mt-2 flex flex-wrap gap-1">
-                    <span
-                        v-for="cat in product.categories"
-                        :key="cat.id"
-                        class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700"
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    class="w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm focus:border-amber-600 focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                    :value="props.categoryFilter ?? ''"
+                    @change="onCategoryChange"
+                >
+                    <option value="">All categories</option>
+                    <option
+                        v-for="category in categories"
+                        :key="category.id"
+                        :value="String(category.id)"
                     >
-                        {{ cat.name }}
-                    </span>
-                </div>
-            </li>
-        </ul>
-    </div>
+                        {{ category.name }}
+                    </option>
+                </select>
+            </div>
+
+            <ul
+                class="divide-y divide-stone-200 overflow-hidden rounded-2xl border border-stone-200/80 bg-white/80 shadow-sm"
+            >
+                <template v-if="products.length === 0">
+                    <li class="px-4 py-6 text-sm text-stone-500">
+                        No products match this filter.
+                    </li>
+                </template>
+                <li
+                    v-for="product in products"
+                    v-else
+                    :key="product.id"
+                    class="flex flex-col gap-1 px-4 py-3"
+                >
+                    <span class="font-medium text-stone-900">{{
+                        product.name
+                    }}</span>
+                    <span class="text-sm text-stone-600">{{
+                        categoryLabel(product)
+                    }}</span>
+                    <span class="text-sm text-stone-800"
+                        >{{ product.price }} SEK</span
+                    >
+                </li>
+            </ul>
+        </div>
+    </PublicLayout>
 </template>
