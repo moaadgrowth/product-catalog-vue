@@ -9,5 +9,9 @@ Route::inertia('/', 'Welcome')->name('home');
 
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 
-Route::get('/admin/products', [AdminProductController::class, 'index'])->name('admin.products.index');
-Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+//Admin routes
+Route::prefix('admin')->name('admin.')->group(function (): void {
+    Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+
+    Route::resource('categories', CategoryController::class)->except(['show']);
+});
